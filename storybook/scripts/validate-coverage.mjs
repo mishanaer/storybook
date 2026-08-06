@@ -25,6 +25,19 @@ const excluded = new Map(
 );
 const errors = [];
 
+if (!inventory.scope?.id || !catalog.scope?.id) {
+  errors.push("Inventory and catalog must declare source scope.");
+} else {
+  if (inventory.scope.id !== catalog.scope.id) {
+    errors.push(`Source scope mismatch: inventory=${inventory.scope.id}, catalog=${catalog.scope.id}`);
+  }
+  if ((inventory.scope.environment ?? null) !== (catalog.scope.environment ?? null)) {
+    errors.push(
+      `Source environment mismatch: inventory=${inventory.scope.environment ?? "<none>"}, catalog=${catalog.scope.environment ?? "<none>"}`
+    );
+  }
+}
+
 for (const source of baselineComponents) {
   if (!covered.has(source) && !excluded.get(source)) errors.push(`Uncovered component: ${source}`);
 }

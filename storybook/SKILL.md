@@ -10,21 +10,23 @@ Create the showcase inside the host product. Reuse its runtime, production compo
 ## Workflow
 
 1. Inspect repository instructions and the working tree. Preserve unrelated changes.
-2. Run `node scripts/inventory.mjs <product-root> --out <inventory.json>` from this skill directory before creating showcase files. Keep this baseline inventory until validation is complete.
-3. Inspect the detected entry points, component exports, token sources, providers, and existing routes. Classify every reusable component as a foundation, primitive, or product component. Read [references/architecture.md](references/architecture.md).
-4. Choose the least invasive integration described in [references/framework-recipes.md](references/framework-recipes.md). Prefer a product route or alternate dev entry over a separate application.
-5. Create a catalog grouped into `Foundations`, `Components`, and product-specific sections. Record the production `componentSource` and `kind` for every component page. Include every reusable production component or add it to `exclusions` with a concrete reason. Use stable slugs and lazy imports where the host supports them.
-6. Add one colocated `*.showcase.*` scenario module per documented component. Import the production component; never duplicate its implementation.
-7. Read [references/canonical-shell.md](references/canonical-shell.md). For React hosts, run `node scripts/install-shell.mjs <product-root> <target-directory>` and integrate the copied `CanonicalStorybookShell.jsx` without editing it or its CSS. For other frameworks, port the same DOM, class names, behavior, and CSS mechanically without visual adaptation.
-8. Add foundation pages for colors, typography, spacing, radii, icons, and motion only when those primitives exist in the product.
-9. Cover meaningful states: default, pressed or active, disabled, loading, error, long content, narrow width, and dark theme where supported.
-10. Validate routes and catalog with `node scripts/validate-catalog.mjs <catalog.json>`, coverage with `node scripts/validate-coverage.mjs <inventory.json> <catalog.json>`, and the installed React shell with `node scripts/validate-shell.mjs <target-directory>`. Resolve every failure. Run the host lint, typecheck, tests, and production build.
-11. Start the showcase on localhost. Use the product's configured or default port when it is free; otherwise select another free port. Never stop, replace, or reuse an unrelated process to claim a port.
-12. Wait until the server reports readiness, verify that its HTTP endpoint responds successfully, and leave the server running for the user. Open the exact local URL in a browser and verify navigation, responsive layout, theme inheritance, interactions, and absence of runtime errors.
+2. Run `node scripts/discover-surfaces.mjs <repository-root>`. If it finds multiple applications or environments with different component trees, show the concise options and ask the user which source is in scope. Do not combine sources by default. Continue without asking only when one source is unambiguous or the user already named it.
+3. Run `node scripts/inventory.mjs <surface-root> --scope <scope-id> --environment <environment> --out <inventory.json>` before creating showcase files. Omit `--environment` only when it does not change the component tree. Keep this baseline inventory until validation is complete.
+4. Inspect the selected source's entry points, component exports, token sources, providers, and existing routes. Classify every reusable component as a foundation, primitive, or product component. Read [references/architecture.md](references/architecture.md).
+5. Choose the least invasive integration described in [references/framework-recipes.md](references/framework-recipes.md). Prefer a product route or alternate dev entry over a separate application.
+6. Create a catalog grouped into `Foundations`, `Components`, and product-specific sections. Copy the selected `scope` from the inventory. Record the production `componentSource` and `kind` for every component page. Include every reusable production component or add it to `exclusions` with a concrete reason. Use stable slugs and lazy imports where the host supports them.
+7. Add one colocated `*.showcase.*` scenario module per documented component. Import the production component; never duplicate its implementation.
+8. Read [references/canonical-shell.md](references/canonical-shell.md). For React hosts, run `node scripts/install-shell.mjs <product-root> <target-directory>` and integrate the copied `CanonicalStorybookShell.jsx` without editing it or its CSS. For other frameworks, port the same DOM, class names, behavior, and CSS mechanically without visual adaptation.
+9. Add foundation pages for colors, typography, spacing, radii, icons, and motion only when those primitives exist in the product.
+10. Cover meaningful states: default, pressed or active, disabled, loading, error, long content, narrow width, and dark theme where supported.
+11. Validate routes and catalog with `node scripts/validate-catalog.mjs <catalog.json>`, coverage and source scope with `node scripts/validate-coverage.mjs <inventory.json> <catalog.json>`, and the installed React shell with `node scripts/validate-shell.mjs <target-directory>`. Resolve every failure. Run the selected environment's lint, typecheck, tests, dev build, and production build when available.
+12. Start the showcase on localhost. Use the selected environment's configured or default port when it is free; otherwise select another free port. Never stop, replace, or reuse an unrelated process to claim a port.
+13. Wait until the server reports readiness, verify that its HTTP endpoint responds successfully, and leave the server running for the user. Open the exact local URL in a browser and verify navigation, responsive layout, theme inheritance, interactions, and absence of runtime errors.
 
 ## Product rules
 
 - Keep the product as the source of truth. Do not create local token or component substitutes.
+- Keep one explicit source scope per catalog. Never silently mix components from sibling apps, packages, legacy trees, generated distributions, or another environment.
 - Treat generic primitives as supporting material, not proof of product coverage. When product-specific components exist, a catalog containing only buttons, inputs, switches, cards, skeletons, or loading states is incomplete.
 - Render real product workflows and recognizable product components before polishing primitive pages.
 - Keep production bundles unchanged. Load showcase modules only from the showcase entry or development route.
@@ -52,4 +54,4 @@ Create the showcase inside the host product. Reuse its runtime, production compo
 
 ## Completion report
 
-State where the showcase lives, how to run it, the exact localhost URL and selected port, which real components and tokens it reuses, what was verified, what was not verified, and any remaining integration risk.
+State the selected source application and environment, where the showcase lives, how to run it, the exact localhost URL and selected port, which real components and tokens it reuses, what was verified, what was not verified, and any remaining integration risk.

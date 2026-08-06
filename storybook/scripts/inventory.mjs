@@ -4,9 +4,13 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 const args = process.argv.slice(2);
-const rootArg = args.find((arg) => !arg.startsWith("--")) ?? ".";
+const rootArg = args[0] && !args[0].startsWith("--") ? args[0] : ".";
 const outIndex = args.indexOf("--out");
 const outArg = outIndex >= 0 ? args[outIndex + 1] : null;
+const scopeIndex = args.indexOf("--scope");
+const scopeArg = scopeIndex >= 0 ? args[scopeIndex + 1] : null;
+const environmentIndex = args.indexOf("--environment");
+const environmentArg = environmentIndex >= 0 ? args[environmentIndex + 1] : null;
 const root = path.resolve(rootArg);
 
 const ignored = new Set([
@@ -71,6 +75,10 @@ for (const file of files.filter((item) => stylePattern.test(item))) {
 
 const inventory = {
   root,
+  scope: {
+    id: scopeArg ?? pkg.name ?? path.basename(root),
+    environment: environmentArg ?? null,
+  },
   framework: detectFramework(pkg),
   packageManager: pkg.packageManager ?? null,
   components: files.filter((file) => componentPattern.test(relative(file))).map(relative).sort(),

@@ -19,6 +19,10 @@ Use JSON when the host benefits from deterministic validation. Framework adapter
 ```json
 {
   "title": "Product UI",
+  "scope": {
+    "id": "product-ui",
+    "environment": "development"
+  },
   "groups": [
     {
       "id": "components",
@@ -38,6 +42,7 @@ Use JSON when the host benefits from deterministic validation. Framework adapter
 ```
 
 IDs must be lowercase kebab-case and unique across the catalog. `source` must be a repository-relative path and must not point outside the product.
+`scope` must exactly match the selected baseline inventory. One catalog represents one application and environment; never merge sibling sources implicitly.
 `componentSource` identifies the production component rendered by the scenario. `kind` is `foundation`, `primitive`, or `product`. Every reusable production component from the baseline inventory must appear as a `componentSource` or in the top-level `exclusions` array with a concrete reason.
 
 ## Scenario contract

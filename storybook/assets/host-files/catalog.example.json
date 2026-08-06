@@ -1,5 +1,9 @@
 {
   "title": "Product UI",
+  "scope": {
+    "id": "product-ui",
+    "environment": "development"
+  },
   "groups": [
     {
       "id": "foundations",

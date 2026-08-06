@@ -17,8 +17,8 @@ const ids = new Set();
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const kinds = new Set(["foundation", "primitive", "product"]);
 
-if (!catalog.title || !Array.isArray(catalog.groups)) {
-  errors.push("Catalog must contain a title and a groups array.");
+if (!catalog.title || !Array.isArray(catalog.groups) || !catalog.scope?.id) {
+  errors.push("Catalog must contain a title, source scope id, and a groups array.");
 }
 
 for (const group of catalog.groups ?? []) {

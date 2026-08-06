@@ -20,6 +20,8 @@ test("inventory finds host components and tokens", async () => {
   const inventory = JSON.parse(stdout);
 
   assert.equal(inventory.framework, "react-vite");
+  assert.equal(inventory.scope.id, path.basename(fixture));
+  assert.equal(inventory.scope.environment, null);
   assert.deepEqual(inventory.components, ["src/components/Button.tsx"]);
   assert.deepEqual(inventory.tokens.names, ["--surface"]);
 });
@@ -37,11 +39,15 @@ test("coverage validator rejects primitive-only catalogs and accepts explicit co
   const components = ["Button", "Input", "Card", "Composer", "Transcript"].map(
     (name) => `src/components/${name}.tsx`
   );
-  await fs.writeFile(inventory, JSON.stringify({ components }));
+  await fs.writeFile(
+    inventory,
+    JSON.stringify({ scope: { id: "type", environment: "desktop" }, components })
+  );
   await fs.writeFile(
     catalog,
     JSON.stringify({
       title: "Product UI",
+      scope: { id: "type", environment: "desktop" },
       groups: [
         {
           id: "components",
@@ -75,6 +81,7 @@ test("coverage validator rejects primitive-only catalogs and accepts explicit co
     catalog,
     JSON.stringify({
       title: "Product UI",
+      scope: { id: "type", environment: "desktop" },
       groups: [
         {
           id: "components",
@@ -102,6 +109,79 @@ test("coverage validator rejects primitive-only catalogs and accepts explicit co
     catalog,
   ]);
   assert.match(stdout, /Coverage is complete: 1 showcased, 4 excluded, 1 product component/);
+});
+
+test("surface discovery lists applications and their runnable environments", async () => {
+  const fixture = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-surfaces-"));
+  for (const [directory, name, script] of [
+    ["apps/type", "type-desktop", "dev:desktop"],
+    ["apps/admin", "type-admin", "dev:web"],
+  ]) {
+    const root = path.join(fixture, directory);
+    await fs.mkdir(root, { recursive: true });
+    await fs.writeFile(
+      path.join(root, "package.json"),
+      JSON.stringify({ name, scripts: { [script]: "vite" }, dependencies: { react: "19", vite: "7" } })
+    );
+  }
+
+  const { stdout } = await exec("node", [
+    path.join(repository, "storybook/scripts/discover-surfaces.mjs"),
+    fixture,
+  ]);
+  const result = JSON.parse(stdout);
+  assert.deepEqual(
+    result.surfaces.map(({ id, root, environments }) => ({ id, root, environments })),
+    [
+      { id: "type-admin", root: "apps/admin", environments: ["dev:web"] },
+      { id: "type-desktop", root: "apps/type", environments: ["dev:desktop"] },
+    ]
+  );
+});
+
+test("coverage validator rejects a catalog from another environment", async () => {
+  const fixture = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-scope-"));
+  const inventory = path.join(fixture, "inventory.json");
+  const catalog = path.join(fixture, "catalog.json");
+  await fs.writeFile(
+    inventory,
+    JSON.stringify({
+      scope: { id: "type", environment: "desktop" },
+      components: ["src/components/Composer.tsx"],
+    })
+  );
+  await fs.writeFile(
+    catalog,
+    JSON.stringify({
+      title: "Type UI",
+      scope: { id: "type", environment: "web" },
+      groups: [
+        {
+          id: "type",
+          title: "Type",
+          items: [
+            {
+              id: "composer",
+              title: "Composer",
+              source: "src/components/Composer.showcase.tsx",
+              componentSource: "src/components/Composer.tsx",
+              kind: "product",
+            },
+          ],
+        },
+      ],
+      exclusions: [],
+    })
+  );
+
+  await assert.rejects(
+    exec("node", [
+      path.join(repository, "storybook/scripts/validate-coverage.mjs"),
+      inventory,
+      catalog,
+    ]),
+    /Source environment mismatch/
+  );
 });
 
 test("canonical shell installer copies immutable shell assets", async () => {
