@@ -1,32 +1,35 @@
 # Canonical Mini Apps shell
 
-Reproduce the same quiet master-detail shell in every product. The product supplies content and token values; it does not redefine the showcase navigation.
+Use the bundled shell as immutable product infrastructure, not as a visual reference to reinterpret.
 
-## Wide layout
+## Installation
 
-- Fix the shell to the viewport and split it horizontally.
-- Set the sidebar width to `clamp(300px, 33.333%, 440px)`.
-- Render the sidebar with the host `surface` token and a subtle right separator.
-- Render the detail pane with the host `background` token.
-- Keep sidebar and detail scrolling independent. Hide the sidebar scrollbar without disabling scroll.
-- Show a centered muted `Select a component` placeholder until a page is selected.
+For React hosts, run:
 
-## Catalog
+```bash
+node scripts/install-shell.mjs <product-root> <target-directory>
+```
 
-- Put one compact app bar at the top with the title `Storybook` and one icon-only theme toggle.
-- Group pages with plain section headers.
-- Render each page as one single-line cell using the host's Cell or closest list-row primitive, including its native pressed state, separator, and trailing chevron.
-- Keep only the component title in a row. Do not add descriptions, counters, version badges, search, or secondary metadata unless the user explicitly requests them.
+Import `CanonicalStorybookShell.jsx` from that directory. Pass catalog groups, the active item, navigation callbacks, theme state, and the preview node. Do not edit the installed JSX or CSS. Run `node scripts/validate-shell.mjs <target-directory>` after integration.
 
-## Detail and narrow layout
+For Vue, Svelte, or plain HTML, port the bundled DOM and state transitions mechanically. Copy `canonical-shell.css` unchanged and preserve every class name and `data-*` attribute.
 
-- Give every detail page its own app bar and product background.
-- On narrow screens, show the catalog as the first screen and navigate to a full-width detail screen with a back action.
-- Preserve hash or nested routes so direct links and refresh work.
-- Use product components only inside scenarios; shell chrome follows this contract even when the host uses another visual language.
+## Isolation boundary
 
-## Token binding
+- Everything rendered by `CanonicalStorybookShell` except `.storybook-preview-content` is shell chrome.
+- Shell chrome always uses the bundled Mini Apps typography, light and dark colors, spacing, radii, separators, icons, and pressed states.
+- Never import host UI controls or apply host utility classes to shell chrome.
+- Mount host providers, resets, fonts, and theme classes at `.storybook-preview-content` or below.
+- Product components may look exactly like the product; the catalog around them must not.
 
-Map these roles to existing product tokens without inventing replacements: `surface`, `background`, primary text, secondary text, separator, and pressed fill. If a role is missing, derive it from the nearest semantic host token and document the mapping.
+## Fixed behavior
 
-Use `assets/showcase-shell/canonical-shell.css` for geometry and behavior. Rename selectors as needed for the host framework, but keep their resulting layout unchanged.
+- Wide: persistent `clamp(300px, 33.333%, 440px)` sidebar and detail pane.
+- Narrow: catalog first, then a full-width detail screen with back action.
+- App bar: centered `Storybook` title, one icon-only theme action.
+- Catalog: plain section headers and single-line cells with separators and trailing chevrons.
+- Empty detail: centered `Select a component` label.
+- Sidebar scrolling remains enabled while its scrollbar stays hidden.
+- Hash or nested routes remain the host adapter's responsibility.
+
+Descriptions, search, counters, version badges, prop tables, and extra toolbar actions are absent unless the user explicitly requests them.

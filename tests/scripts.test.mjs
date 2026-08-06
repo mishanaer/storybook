@@ -103,3 +103,21 @@ test("coverage validator rejects primitive-only catalogs and accepts explicit co
   ]);
   assert.match(stdout, /Coverage is complete: 1 showcased, 4 excluded, 1 product component/);
 });
+
+test("canonical shell installer copies immutable shell assets", async () => {
+  const fixture = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-shell-"));
+  const target = "src/showcase/shell";
+  await exec("node", [
+    path.join(repository, "storybook/scripts/install-shell.mjs"),
+    fixture,
+    target,
+  ]);
+
+  const validator = path.join(repository, "storybook/scripts/validate-shell.mjs");
+  const targetDirectory = path.join(fixture, target);
+  const { stdout } = await exec("node", [validator, targetDirectory]);
+  assert.match(stdout, /installed unchanged/);
+
+  await fs.appendFile(path.join(targetDirectory, "canonical-shell.css"), "\n.host-override {}\n");
+  await assert.rejects(exec("node", [validator, targetDirectory]), /Canonical shell file was modified/);
+});

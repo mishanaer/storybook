@@ -2,11 +2,11 @@
 
 ## React with Vite
 
-Prefer an alternate HTML entry or a development-only route. Use `import.meta.glob` for colocated `*.showcase.{js,jsx,ts,tsx}` files when naming is consistent. Reuse the existing React root providers. Ensure Vite's checker and linters exclude generated build output.
+Prefer an alternate HTML entry or a development-only route. Install and import the immutable React shell described in [canonical-shell.md](canonical-shell.md). Use `import.meta.glob` for colocated `*.showcase.{js,jsx,ts,tsx}` files when naming is consistent. Mount existing React providers inside the shell's preview boundary. Ensure Vite's checker and linters exclude generated build output.
 
 ## Next.js
 
-Add a development-gated route such as `/showcase/[[...slug]]`. Keep the catalog and scenario imports in a client boundary only when interaction requires it. Use dynamic imports for heavy pages. Make the route return `notFound()` in production unless public exposure is intentional.
+Add a development-gated route such as `/showcase/[[...slug]]`. Install the immutable React shell inside its client boundary and mount product providers inside the preview boundary. Use dynamic imports for heavy pages. Make the route return `notFound()` in production unless public exposure is intentional.
 
 ## Vue with Vite
 
