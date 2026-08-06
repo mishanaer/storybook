@@ -28,6 +28,8 @@ Use $storybook to build a component showcase from this product.
 
 ## Example
 
+Live demo: [storybook-showcase-seven.vercel.app](https://storybook-showcase-seven.vercel.app)
+
 The dependency-free example in [`storybook/assets/example-showcase`](storybook/assets/example-showcase) demonstrates the target interaction model. Run it locally:
 
 ```bash
