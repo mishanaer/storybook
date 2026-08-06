@@ -1,0 +1,72 @@
+.showcase-shell {
+  --showcase-sidebar-width: clamp(300px, 33.333%, 440px);
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  color: var(--showcase-primary-text);
+}
+
+.showcase-sidebar {
+  flex: 0 0 var(--showcase-sidebar-width);
+  width: var(--showcase-sidebar-width);
+  height: 100%;
+  overflow: hidden;
+  border-right: 0.5px solid var(--showcase-separator);
+  background: var(--showcase-surface);
+  animation: showcase-sidebar-in 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.showcase-sidebar-scroll {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.showcase-sidebar-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.showcase-detail {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--showcase-background);
+}
+
+.showcase-placeholder {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  color: var(--showcase-secondary-text);
+}
+
+@keyframes showcase-sidebar-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .showcase-shell {
+    position: relative;
+    display: block;
+    min-height: 100%;
+  }
+
+  .showcase-sidebar,
+  .showcase-detail {
+    width: 100%;
+    min-height: 100%;
+    border: 0;
+  }
+}

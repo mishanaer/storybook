@@ -8,7 +8,8 @@
         {
           "id": "colors",
           "title": "Colors",
-          "source": "src/showcase/foundations/Colors.showcase.tsx"
+          "source": "src/showcase/foundations/Colors.showcase.tsx",
+          "kind": "foundation"
         }
       ]
     },
@@ -19,9 +20,19 @@
         {
           "id": "button",
           "title": "Button",
-          "source": "src/components/Button/Button.showcase.tsx"
+          "source": "src/components/Button/Button.showcase.tsx",
+          "componentSource": "src/components/Button/Button.tsx",
+          "kind": "primitive"
+        },
+        {
+          "id": "message-composer",
+          "title": "Message Composer",
+          "source": "src/components/MessageComposer/MessageComposer.showcase.tsx",
+          "componentSource": "src/components/MessageComposer/MessageComposer.tsx",
+          "kind": "product"
         }
       ]
     }
-  ]
+  ],
+  "exclusions": []
 }

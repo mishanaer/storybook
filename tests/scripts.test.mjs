@@ -27,5 +27,79 @@ test("inventory finds host components and tokens", async () => {
 test("example catalog follows the portable contract", async () => {
   const catalog = path.join(repository, "storybook/assets/host-files/catalog.example.json");
   const { stdout } = await exec("node", [path.join(repository, "storybook/scripts/validate-catalog.mjs"), catalog]);
-  assert.match(stdout, /Catalog is valid: 2 item\(s\)/);
+  assert.match(stdout, /Catalog is valid: 3 item\(s\)/);
+});
+
+test("coverage validator rejects primitive-only catalogs and accepts explicit coverage", async () => {
+  const fixture = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-coverage-"));
+  const inventory = path.join(fixture, "inventory.json");
+  const catalog = path.join(fixture, "catalog.json");
+  const components = ["Button", "Input", "Card", "Composer", "Transcript"].map(
+    (name) => `src/components/${name}.tsx`
+  );
+  await fs.writeFile(inventory, JSON.stringify({ components }));
+  await fs.writeFile(
+    catalog,
+    JSON.stringify({
+      title: "Product UI",
+      groups: [
+        {
+          id: "components",
+          title: "Components",
+          items: components.slice(0, 3).map((source) => ({
+            id: path.basename(source, ".tsx").toLowerCase(),
+            title: path.basename(source, ".tsx"),
+            source: source.replace(".tsx", ".showcase.tsx"),
+            componentSource: source,
+            kind: "primitive",
+          })),
+        },
+      ],
+      exclusions: components.slice(3).map((source) => ({
+        source,
+        reason: "Requires a native runtime fixture.",
+      })),
+    })
+  );
+
+  await assert.rejects(
+    exec("node", [
+      path.join(repository, "storybook/scripts/validate-coverage.mjs"),
+      inventory,
+      catalog,
+    ]),
+    /Catalog has no product components/
+  );
+
+  await fs.writeFile(
+    catalog,
+    JSON.stringify({
+      title: "Product UI",
+      groups: [
+        {
+          id: "components",
+          title: "Components",
+          items: [
+            {
+              id: "composer",
+              title: "Composer",
+              source: "src/components/Composer.showcase.tsx",
+              componentSource: "src/components/Composer.tsx",
+              kind: "product",
+            },
+          ],
+        },
+      ],
+      exclusions: components
+        .filter((source) => !source.endsWith("Composer.tsx"))
+        .map((source) => ({ source, reason: "Requires a native runtime fixture." })),
+    })
+  );
+
+  const { stdout } = await exec("node", [
+    path.join(repository, "storybook/scripts/validate-coverage.mjs"),
+    inventory,
+    catalog,
+  ]);
+  assert.match(stdout, /Coverage is complete: 1 showcased, 4 excluded, 1 product component/);
 });

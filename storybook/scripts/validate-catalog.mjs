@@ -15,6 +15,7 @@ const catalog = JSON.parse(await fs.readFile(catalogPath, "utf8"));
 const errors = [];
 const ids = new Set();
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const kinds = new Set(["foundation", "primitive", "product"]);
 
 if (!catalog.title || !Array.isArray(catalog.groups)) {
   errors.push("Catalog must contain a title and a groups array.");
@@ -29,9 +30,25 @@ for (const group of catalog.groups ?? []) {
     if (ids.has(item.id)) errors.push(`Duplicate item id: ${item.id}`);
     ids.add(item.id);
     if (!item.title || !item.source) errors.push(`Item ${item.id ?? "<missing>"} needs a title and source.`);
+    if (!kinds.has(item.kind)) errors.push(`Item ${item.id ?? "<missing>"} needs a valid kind.`);
+    if (item.kind !== "foundation" && !item.componentSource) {
+      errors.push(`Component item ${item.id ?? "<missing>"} needs componentSource.`);
+    }
 
     const source = path.resolve(productRoot, item.source ?? "");
     if (!source.startsWith(`${productRoot}${path.sep}`)) errors.push(`Item ${item.id} points outside the product.`);
+    if (item.componentSource) {
+      const componentSource = path.resolve(productRoot, item.componentSource);
+      if (!componentSource.startsWith(`${productRoot}${path.sep}`)) {
+        errors.push(`Item ${item.id} componentSource points outside the product.`);
+      }
+    }
+  }
+}
+
+for (const exclusion of catalog.exclusions ?? []) {
+  if (!exclusion.source || !exclusion.reason?.trim()) {
+    errors.push("Each exclusion needs source and reason.");
   }
 }
 

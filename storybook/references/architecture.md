@@ -27,7 +27,9 @@ Use JSON when the host benefits from deterministic validation. Framework adapter
         {
           "id": "button",
           "title": "Button",
-          "source": "src/components/Button/Button.showcase.tsx"
+          "source": "src/components/Button/Button.showcase.tsx",
+          "componentSource": "src/components/Button/Button.tsx",
+          "kind": "primitive"
         }
       ]
     }
@@ -36,6 +38,7 @@ Use JSON when the host benefits from deterministic validation. Framework adapter
 ```
 
 IDs must be lowercase kebab-case and unique across the catalog. `source` must be a repository-relative path and must not point outside the product.
+`componentSource` identifies the production component rendered by the scenario. `kind` is `foundation`, `primitive`, or `product`. Every reusable production component from the baseline inventory must appear as a `componentSource` or in the top-level `exclusions` array with a concrete reason.
 
 ## Scenario contract
 
@@ -54,7 +57,7 @@ Recommended page structure:
 - Wide screens: persistent sidebar and detail canvas.
 - Narrow screens: catalog first, then a detail screen with a back action.
 - Hash or nested routes must survive refresh and allow direct links.
-- Search filters titles and group names without changing the catalog.
+- Do not add search unless the user explicitly requests it. If requested, filter titles and group names without changing the catalog.
 - Theme control must use the host theme mechanism.
 - Sidebar scrolling remains available while its scrollbar is visually hidden.
 - Detail failures stay isolated through an error boundary.
@@ -65,6 +68,9 @@ Recommended page structure:
 - No new visual token is invented when an equivalent host token exists.
 - The showcase does not enter the production bundle unless explicitly configured.
 - At least one foundation page and three representative component pages render.
-- Direct routes, back navigation, search, theme switching, and narrow layout work.
+- Product-specific components are present whenever the product contains them; primitive-only catalogs are rejected.
+- Every baseline inventory component is covered by a catalog item or an explicit justified exclusion.
+- The shell matches the canonical Mini Apps hierarchy, geometry, token roles, and responsive behavior.
+- Direct routes, back navigation, theme switching, and narrow layout work.
 - The host lint or typecheck and production build pass.
 - The browser console has no new errors on representative pages.
