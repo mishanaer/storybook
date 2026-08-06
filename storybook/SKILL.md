@@ -1,9 +1,9 @@
 ---
-name: build-component-showcase
+name: storybook
 description: Build or refresh a lightweight component showcase inside an existing web product by discovering its real components, design tokens, themes, and states. Use when Codex needs to create a component gallery, UI kit browser, design-system showroom, internal Storybook alternative, component catalog, or a Mini Apps-style showcase without introducing a second component library or a heavy standalone documentation framework.
 ---
 
-# Build Component Showcase
+# Storybook
 
 Create the showcase from the host product, not beside it. Reuse its runtime, components, tokens, fonts, providers, routing conventions, and build tooling.
 

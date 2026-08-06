@@ -1,4 +1,0 @@
-interface:
-  display_name: "Component Showcase Builder"
-  short_description: "Build a lightweight showcase from an existing product"
-  default_prompt: "Use $build-component-showcase to turn this product's existing components and tokens into a lightweight component showcase."

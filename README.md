@@ -1,4 +1,4 @@
-# StoryBook
+# storybook
 
 A reusable Codex skill for turning an existing product into a lightweight component showcase.
 
@@ -7,14 +7,14 @@ This is intentionally not the Storybook framework. The skill studies the product
 ## Install
 
 ```bash
-git clone https://github.com/mishanaer/StoryBook.git
-cp -R StoryBook/build-component-showcase ~/.codex/skills/
+git clone https://github.com/mishanaer/storybook.git
+cp -R storybook/storybook ~/.codex/skills/
 ```
 
 Restart Codex, then ask:
 
 ```text
-Use $build-component-showcase to build a component showcase from this product.
+Use $storybook to build a component showcase from this product.
 ```
 
 ## What the skill does
@@ -28,10 +28,10 @@ Use $build-component-showcase to build a component showcase from this product.
 
 ## Example
 
-The dependency-free example in [`build-component-showcase/assets/example-showcase`](build-component-showcase/assets/example-showcase) demonstrates the target interaction model. Run it locally:
+The dependency-free example in [`storybook/assets/example-showcase`](storybook/assets/example-showcase) demonstrates the target interaction model. Run it locally:
 
 ```bash
-cd build-component-showcase/assets/example-showcase
+cd storybook/assets/example-showcase
 python3 -m http.server 4173
 ```
 
@@ -40,7 +40,7 @@ Then open `http://localhost:4173`.
 ## Repository structure
 
 ```text
-build-component-showcase/
+storybook/
 ├── SKILL.md
 ├── agents/openai.yaml
 ├── scripts/

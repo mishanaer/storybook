@@ -16,7 +16,7 @@ test("inventory finds host components and tokens", async () => {
   await fs.writeFile(path.join(fixture, "src/components/Button.tsx"), "export const Button = () => <button />;");
   await fs.writeFile(path.join(fixture, "src/tokens.css"), ":root { --surface: #fff; }");
 
-  const { stdout } = await exec("node", [path.join(repository, "build-component-showcase/scripts/inventory.mjs"), fixture]);
+  const { stdout } = await exec("node", [path.join(repository, "storybook/scripts/inventory.mjs"), fixture]);
   const inventory = JSON.parse(stdout);
 
   assert.equal(inventory.framework, "react-vite");
@@ -25,7 +25,7 @@ test("inventory finds host components and tokens", async () => {
 });
 
 test("example catalog follows the portable contract", async () => {
-  const catalog = path.join(repository, "build-component-showcase/assets/host-files/catalog.example.json");
-  const { stdout } = await exec("node", [path.join(repository, "build-component-showcase/scripts/validate-catalog.mjs"), catalog]);
+  const catalog = path.join(repository, "storybook/assets/host-files/catalog.example.json");
+  const { stdout } = await exec("node", [path.join(repository, "storybook/scripts/validate-catalog.mjs"), catalog]);
   assert.match(stdout, /Catalog is valid: 2 item\(s\)/);
 });
