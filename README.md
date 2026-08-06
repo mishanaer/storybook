@@ -1,8 +1,8 @@
 ## Storybook
 
-Storybook is a lightweight component showcase built from the product you already have.
-It reuses real components, tokens, themes, and states without adding the Storybook framework
-or a second design system
+Storybook is a lightweight, production-faithful component showcase built from the product you already have.
+It renders real production roots, tokens, styles, providers, themes, and states without adding the Storybook framework
+or a second design system.
 
 ### Skill
 
@@ -12,10 +12,13 @@ and run it on a free localhost port
 ### Showcase
 
 - real product components
+- React Web and Electron renderer adapters with an isolated iframe preview
 - colors, typography, icons, and other existing foundations
 - component states and realistic scenarios
-- searchable sidebar and focused preview area
+- immutable Mini Apps sidebar and focused preview area
 - light and dark themes when the product supports them
+- automated provenance checks: copied visual UI and showcase-only CSS are rejected
+- transitive coverage from the selected production entry, with explicit exclusions for anything not reached
 
 ### Example
 

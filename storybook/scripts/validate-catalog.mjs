@@ -31,19 +31,29 @@ for (const group of catalog.groups ?? []) {
     ids.add(item.id);
     if (!item.title || !item.source) errors.push(`Item ${item.id ?? "<missing>"} needs a title and source.`);
     if (!kinds.has(item.kind)) errors.push(`Item ${item.id ?? "<missing>"} needs a valid kind.`);
-    if (item.kind !== "foundation" && !item.componentSource) {
-      errors.push(`Component item ${item.id ?? "<missing>"} needs componentSource.`);
+    if (item.kind !== "foundation" && !item.productionRoot) {
+      errors.push(`Component item ${item.id ?? "<missing>"} needs productionRoot.`);
+    }
+    if (item.kind !== "foundation" && !Array.isArray(item.states)) {
+      errors.push(`Component item ${item.id ?? "<missing>"} needs states.`);
+    }
+    if (item.kind !== "foundation" && !Array.isArray(item.boundaries)) {
+      errors.push(`Component item ${item.id ?? "<missing>"} needs boundaries.`);
     }
 
     const source = path.resolve(productRoot, item.source ?? "");
     if (!source.startsWith(`${productRoot}${path.sep}`)) errors.push(`Item ${item.id} points outside the product.`);
-    if (item.componentSource) {
-      const componentSource = path.resolve(productRoot, item.componentSource);
-      if (!componentSource.startsWith(`${productRoot}${path.sep}`)) {
-        errors.push(`Item ${item.id} componentSource points outside the product.`);
+    if (item.productionRoot) {
+      const productionRoot = path.resolve(productRoot, item.productionRoot);
+      if (!productionRoot.startsWith(`${productRoot}${path.sep}`)) {
+        errors.push(`Item ${item.id} productionRoot points outside the product.`);
       }
     }
   }
+}
+
+if (catalog.preview?.isolation !== "iframe") {
+  errors.push("Catalog preview.isolation must be iframe.");
 }
 
 for (const exclusion of catalog.exclusions ?? []) {
