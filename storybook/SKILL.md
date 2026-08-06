@@ -19,7 +19,8 @@ Create the showcase from the host product, not beside it. Reuse its runtime, com
 8. Add foundation pages for colors, typography, spacing, radii, icons, and motion only when those primitives exist in the product.
 9. Cover meaningful states: default, pressed or active, disabled, loading, error, long content, narrow width, and dark theme where supported.
 10. Validate routes and catalog with `node scripts/validate-catalog.mjs <catalog.json>` when using the JSON contract. Run the host lint, typecheck, tests, and production build.
-11. Open the showcase in a browser and verify navigation, responsive layout, theme inheritance, interactions, and absence of runtime errors.
+11. Start the showcase on localhost. Use the product's configured or default port when it is free; otherwise select another free port. Never stop, replace, or reuse an unrelated process to claim a port.
+12. Wait until the server reports readiness, verify that its HTTP endpoint responds successfully, and leave the server running for the user. Open the exact local URL in a browser and verify navigation, responsive layout, theme inheritance, interactions, and absence of runtime errors.
 
 ## Product rules
 
@@ -29,6 +30,8 @@ Create the showcase from the host product, not beside it. Reuse its runtime, com
 - Preserve providers required by real components: theme, localization, router, data clients, portals, and platform adapters.
 - Stub network boundaries, not visual components. Keep fixtures deterministic and local.
 - Make the first useful screen render even when optional APIs are unavailable.
+- Bind the development server to localhost by default. Do not expose it to the local network or the internet unless the user explicitly asks.
+- Keep the chosen localhost port stable for the rest of the task. If the server exits, diagnose and restart it on the same port when possible.
 - Hide the sidebar scrollbar without disabling scrolling.
 - Use the canvas background token declared by the host product; never hardcode light or dark canvas colors.
 - Keep controls few and task-oriented. Prefer scenario sections over generic prop tables.
@@ -41,4 +44,4 @@ Create the showcase from the host product, not beside it. Reuse its runtime, com
 
 ## Completion report
 
-State where the showcase lives, how to run it, which real components and tokens it reuses, what was verified, what was not verified, and any remaining integration risk.
+State where the showcase lives, how to run it, the exact localhost URL and selected port, which real components and tokens it reuses, what was verified, what was not verified, and any remaining integration risk.
