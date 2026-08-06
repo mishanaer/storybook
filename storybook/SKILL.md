@@ -35,7 +35,6 @@ Create the showcase from the host product, not beside it. Reuse its runtime, com
 
 ## Bundled resources
 
-- Use `assets/example-showcase/` as a runnable visual example of the interaction model, not as a replacement design system.
 - Use `assets/host-files/catalog.example.json` as the portable catalog contract.
 - Read `references/architecture.md` for the required information architecture and acceptance criteria.
 - Read `references/framework-recipes.md` only for the detected host framework.

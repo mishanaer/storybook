@@ -30,14 +30,7 @@ Use $storybook to build a component showcase from this product.
 
 Live demo: [storybook-showcase-seven.vercel.app](https://storybook-showcase-seven.vercel.app)
 
-The dependency-free example in [`storybook/assets/example-showcase`](storybook/assets/example-showcase) demonstrates the target interaction model. Run it locally:
-
-```bash
-cd storybook/assets/example-showcase
-python3 -m http.server 4173
-```
-
-Then open `http://localhost:4173`.
+The live demo is a production build of the [Deslop Mini Apps showcase](https://github.com/mishanaer/deslop/tree/main/mini-app). It renders the product's real components, tokens, typography, themes, and interaction states rather than a visual imitation.
 
 ## Repository structure
 
