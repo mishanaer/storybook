@@ -1,0 +1,27 @@
+{
+  "title": "Product UI",
+  "groups": [
+    {
+      "id": "foundations",
+      "title": "Foundations",
+      "items": [
+        {
+          "id": "colors",
+          "title": "Colors",
+          "source": "src/showcase/foundations/Colors.showcase.tsx"
+        }
+      ]
+    },
+    {
+      "id": "components",
+      "title": "Components",
+      "items": [
+        {
+          "id": "button",
+          "title": "Button",
+          "source": "src/components/Button/Button.showcase.tsx"
+        }
+      ]
+    }
+  ]
+}
