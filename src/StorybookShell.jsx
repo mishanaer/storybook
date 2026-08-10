@@ -1,4 +1,5 @@
-import "./canonical-shell.css";
+import React from "react";
+import "./storybook-shell.css";
 
 function ChevronIcon() {
   return (
@@ -29,16 +30,16 @@ function ThemeIcon({ theme }) {
   );
 }
 
-export default function CanonicalStorybookShell({
-  groups,
-  activeId,
+export function StorybookShell({
+  groups = [],
+  activeId = null,
   onSelect,
   onBack,
   theme = "light",
   onToggleTheme,
   children,
 }) {
-  const items = groups.flatMap((group) => group.items);
+  const items = groups.flatMap((group) => group.items ?? []);
   const activeItem = items.find((item) => item.id === activeId);
   const nextTheme = theme === "dark" ? "light" : "dark";
 
@@ -49,7 +50,7 @@ export default function CanonicalStorybookShell({
           <header className="storybook-appbar">
             <span aria-hidden="true" />
             <div className="storybook-appbar-title">Storybook</div>
-            <button className="storybook-appbar-action" type="button" onClick={onToggleTheme} aria-label={`Switch to ${nextTheme} theme`}>
+            <button className="storybook-appbar-action" type="button" onClick={onToggleTheme} aria-label={`Switch to ${nextTheme} theme`} disabled={!onToggleTheme}>
               <ThemeIcon theme={theme} />
             </button>
           </header>
@@ -59,13 +60,13 @@ export default function CanonicalStorybookShell({
               <section key={group.id}>
                 <h2 className="storybook-catalog-heading">{group.title}</h2>
                 <div className="storybook-catalog-group">
-                  {group.items.map((item) => (
+                  {(group.items ?? []).map((item) => (
                     <button
                       key={item.id}
                       className="storybook-catalog-cell"
                       type="button"
                       aria-current={activeItem?.id === item.id ? "page" : undefined}
-                      onClick={() => onSelect(item.id)}
+                      onClick={() => onSelect?.(item.id)}
                     >
                       <span className="storybook-catalog-cell-label">{item.title}</span>
                       <ChevronIcon />
@@ -101,3 +102,5 @@ export default function CanonicalStorybookShell({
     </div>
   );
 }
+
+export default StorybookShell;

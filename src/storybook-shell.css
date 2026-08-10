@@ -103,6 +103,10 @@
   cursor: pointer;
 }
 
+.storybook-appbar-action:disabled {
+  cursor: default;
+}
+
 .storybook-shell[data-theme="dark"] .storybook-appbar-action {
   box-shadow: none;
 }

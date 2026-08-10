@@ -1,25 +1,68 @@
-## Storybook
+# Storybook Shell
 
-Storybook is a lightweight, production-faithful component showcase built from the product you already have.
-It renders real production roots, tokens, styles, providers, themes, and states without adding the Storybook framework
-or a second design system.
+A small React wrapper for component showcases. It provides the canonical sidebar, navigation, theme switcher, responsive layout, and preview area. It does not discover, generate, copy, or validate product components.
 
-### Skill
+[Open the live example](https://storybook-showcase-seven.vercel.app)
 
-Use `$storybook` when you want an agent to turn an existing product into a component showcase
-and run it on a free localhost port
+## Install
 
-### Showcase
+```bash
+npm install github:mishanaer/storybook
+```
 
-- real product components
-- React Web and Electron renderer adapters with an isolated iframe preview
-- colors, typography, icons, and other existing foundations
-- component states and realistic scenarios
-- immutable Mini Apps sidebar and focused preview area
-- light and dark themes when the product supports them
-- automated provenance checks: copied visual UI and showcase-only CSS are rejected
-- transitive coverage from the selected production entry, with explicit exclusions for anything not reached
+## Use
 
-### Example
+```jsx
+import { useState } from "react";
+import { StorybookShell } from "@mishanaer/storybook-shell";
 
-[Open the live showcase](https://storybook-showcase-seven.vercel.app)
+const groups = [
+  {
+    id: "components",
+    title: "Components",
+    items: [
+      { id: "button", title: "Button" },
+      { id: "card", title: "Card" },
+    ],
+  },
+];
+
+export function Showcase() {
+  const [activeId, setActiveId] = useState("button");
+  const [theme, setTheme] = useState("light");
+
+  return (
+    <StorybookShell
+      groups={groups}
+      activeId={activeId}
+      onSelect={setActiveId}
+      onBack={() => setActiveId(null)}
+      theme={theme}
+      onToggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
+    >
+      {activeId === "button" ? <YourButtonExamples /> : <YourCardExamples />}
+    </StorybookShell>
+  );
+}
+```
+
+The package owns only the showcase chrome. The application owns the catalog and everything rendered inside the preview.
+
+## API
+
+- `groups` — sidebar sections and `{ id, title }` items.
+- `activeId` — selected item ID or `null`.
+- `onSelect(id)` — item selection handler.
+- `onBack()` — mobile back handler.
+- `theme` — `light` or `dark`.
+- `onToggleTheme()` — theme action handler.
+- `children` — any existing showcase page.
+
+## Develop
+
+```bash
+npm install
+npm run dev
+```
+
+Build the live example with `npm run build`. Verify the package contents with `npm run pack:check`.

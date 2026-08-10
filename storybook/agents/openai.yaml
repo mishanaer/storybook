@@ -1,4 +1,0 @@
-interface:
-  display_name: "Storybook"
-  short_description: "Build production-faithful showcases from real app roots"
-  default_prompt: "Use $storybook to build a production-faithful component showcase from this app environment."
