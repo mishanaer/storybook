@@ -1,7 +1,10 @@
 import React from "react";
 
 import { Cell } from "../mini-app/components/Cells/index.js";
-import { GlassContainer } from "../mini-app/components/GlassEffect/index.js";
+import {
+  GlassBorder,
+  GlassContainer,
+} from "../mini-app/components/GlassEffect/index.js";
 import PanelHeader from "../mini-app/components/PanelHeader/index.js";
 import SectionHeader from "../mini-app/components/SectionHeader/index.js";
 import Text from "../mini-app/components/Text/index.js";
@@ -48,6 +51,7 @@ export function StorybookShell({
                 title={`Switch to ${nextTheme} theme`}
                 disabled={!onToggleTheme}
               >
+                <GlassBorder muted />
                 <ThemeIcon size={24} weight={400} />
               </button>
             </GlassContainer>
@@ -92,6 +96,7 @@ export function StorybookShell({
                   aria-label="Back to catalog"
                   title="Back to catalog"
                 >
+                  <GlassBorder muted />
                   <IconChevronLeft size={24} weight={400} />
                 </button>
               </GlassContainer>
