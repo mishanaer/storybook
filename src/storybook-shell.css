@@ -35,7 +35,8 @@
 
 .storybook-appbar,
 .storybook-catalog,
-.storybook-placeholder {
+.storybook-placeholder,
+.storybook-runtime-status {
   font-family: "SB Sans Interface", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -213,21 +214,38 @@
 
 .storybook-preview {
   height: calc(100% - 64px);
-  overflow: auto;
+  overflow: hidden;
   background: var(--storybook-background);
 }
 
 .storybook-preview-content {
   min-height: 100%;
+  height: 100%;
 }
 
-.storybook-placeholder {
+.storybook-core-preview-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 64px);
+  background: transparent;
+  border: 0;
+}
+
+.storybook-placeholder,
+.storybook-runtime-status {
   display: grid;
   min-height: 100%;
   place-items: center;
   color: var(--storybook-primary-60);
   font-size: 16px;
   line-height: 20px;
+}
+
+.storybook-runtime-status {
+  position: fixed;
+  inset: 0;
+  background: var(--storybook-background, #ffffff);
 }
 
 @keyframes storybook-sidebar-in {
