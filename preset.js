@@ -1,0 +1,8 @@
+import { fileURLToPath } from "node:url";
+
+export function managerEntries(entry = []) {
+  return [
+    ...entry,
+    fileURLToPath(import.meta.resolve("./src/storybook/manager.jsx")),
+  ];
+}
