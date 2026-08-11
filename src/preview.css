@@ -1,0 +1,10 @@
+@import "../mini-app/styles/index.css";
+@import "../mini-app/styles/app-shell.css";
+
+html,
+body,
+#storybook-root,
+#storybook-root > [data-mini-app] {
+    min-height: 100%;
+    background: var(--surface);
+}
