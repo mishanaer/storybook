@@ -1,7 +1,16 @@
 .DS_Store
 node_modules/
+.cache/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 coverage/
 dist/
+storybook-static/
+debug-storybook.log
 *.tgz
 .vercel
 .env*

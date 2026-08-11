@@ -1,0 +1,20 @@
+.status {
+  display: flex;
+  min-height: 100%;
+  padding: var(--ui-layout-content-inset);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-16);
+}
+
+.status > :last-child:not(:first-child) {
+  width: min(100%, 320px);
+}
+
+.modalContent {
+  display: flex;
+  padding: 0 var(--ui-layout-content-inset) var(--ui-layout-content-inset);
+  flex-direction: column;
+  gap: var(--ui-space-16);
+}

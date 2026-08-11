@@ -1,172 +1,97 @@
-# Storybook
+# Butcher
 
-A custom Storybook UI powered by the original Storybook runtime.
+Butcher is a reusable custom Storybook shell for React projects. It replaces the
+default Storybook manager UI with the Butcher catalog, while keeping Storybook
+Core responsible for discovering and rendering the connected project's stories.
 
-This repository owns the visible interface — sidebar, navigation, responsive layout, theme and preview chrome — while upstream Storybook keeps responsibility for the actual mechanics: CSF stories, story discovery, framework rendering, decorators, loaders, play functions, args/globals infrastructure, HMR and Preview.
+In other words:
 
-[Open the shell demo](https://storybook-showcase-seven.vercel.app)
+- Butcher owns the visible sidebar, navigation, theme, responsive layout, and
+  preview chrome;
+- the target project decides which components and stories appear in it;
+- Butcher does not copy or replace the target project's components.
 
-## How it works
+## Connect to a project
 
-```text
-*.stories.tsx
-    │
-    ▼
-Storybook Core / CSF / story index
-    │
-    ▼
-storybook/manager-api
-    │
-    ▼
-Storybook adapter
-    │
-    ▼
-Custom Storybook UI
-    │
-    ▼
-Original Storybook Preview
-```
-
-The goal is not to reimplement Storybook. The goal is to keep Storybook-compatible stories and runtime behavior while replacing the default manager UI with the interface from this repository.
-
-## Current functionality
-
-- Reads the real Storybook story index
-- Automatically turns discovered `*.stories.*` files into the custom catalog
-- Uses Storybook's navigation API when selecting a story
-- Renders stories through the original Storybook Preview iframe
-- Keeps the selected story in the manager URL for deep linking
-- Hides the default Storybook navigation, toolbar and addon panel
-- Keeps the existing standalone `StorybookShell` API available
-
-## Install
-
-Use this package inside an existing Storybook 10+ project:
+Install Butcher as a development dependency:
 
 ```bash
-npm install github:mishanaer/storybook
+npm install --save-dev github:mishanaer/Butcher
 ```
 
-Add it to `.storybook/main.ts`:
+Create `.storybook/main.js` in the target project:
 
-```ts
-import type { StorybookConfig } from "@storybook/react-vite";
+```js
+import { defineButcherConfig } from "@mishanaer/butcher/config"
 
-const config: StorybookConfig = {
-  stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
-  addons: ["@mishanaer/storybook-shell"],
-};
-
-export default config;
+export default defineButcherConfig({
+    stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+})
 ```
 
-Then run Storybook normally:
+Add scripts to the target project's `package.json`:
+
+```json
+{
+    "scripts": {
+        "storybook": "butcher dev",
+        "build:storybook": "butcher build"
+    }
+}
+```
+
+Run:
 
 ```bash
 npm run storybook
 ```
 
-## Stories stay standard
+The catalog opens at <http://localhost:6006>. The pink Storybook sidebar,
+onboarding card, toolbar, and addon panel are replaced by the Butcher shell. No
+local Storybook dependency, addon registration, or preview decorator is required.
 
-No custom story format is required. Existing CSF stories remain unchanged:
-
-```tsx
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button } from "./Button";
-
-const meta = {
-  component: Button,
-} satisfies Meta<typeof Button>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
-  args: {
-    children: "Button",
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    loading: true,
-    children: "Button",
-  },
-};
-```
-
-Storybook Core discovers and processes these stories; this package only replaces the visible manager experience.
-
-## Architecture
-
-`src/storybook/manager.jsx` is the bridge between Storybook Manager and the custom shell. It reads Storybook state, handles navigation and generates Preview URLs.
-
-`src/storybook/adapter.js` converts Storybook's story index into the catalog model expected by `StorybookShell`. Keeping that transformation separate means the UI does not need to depend directly on Storybook's internal index shape.
-
-`preset.js` registers the custom manager entry when the package is added as a Storybook addon.
-
-## Next
-
-The current integration covers the core vertical slice: story discovery → custom navigation → original Preview. The next layers are custom UI for Controls/Args, Globals, Actions/Interactions and richer Storybook addon surfaces without bringing back the default manager chrome.
-
-## Standalone shell
-
-The UI can still be used without Storybook:
+Stories continue to import components from the target project:
 
 ```jsx
-import { useState } from "react";
-import { StorybookShell } from "@mishanaer/storybook-shell";
+import Button from "../components/Button"
 
-const groups = [
-  {
-    id: "components",
-    title: "Components",
-    items: [
-      { id: "button", title: "Button" },
-      { id: "card", title: "Card" },
-    ],
-  },
-];
+export default { title: "Components/Button" }
 
-export function Showcase() {
-  const [activeId, setActiveId] = useState("button");
-  const [theme, setTheme] = useState("light");
-
-  return (
-    <StorybookShell
-      groups={groups}
-      activeId={activeId}
-      onSelect={setActiveId}
-      onBack={() => setActiveId(null)}
-      theme={theme}
-      onToggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
-    >
-      {activeId === "button" ? <YourButtonExamples /> : <YourCardExamples />}
-    </StorybookShell>
-  );
+export const Default = {
+    render: () => <Button>Project component</Button>,
 }
 ```
 
-## Shell API
+The component is local to the project, while primitives such as
+`--accent-green`, `--ui-space-16`, and `--ui-radius-22` are available in the
+preview automatically.
 
-- `groups` — sidebar sections and `{ id, title }` items
-- `activeId` — selected item ID or `null`
-- `onSelect(id)` — item selection handler
-- `onBack()` — mobile back handler
-- `theme` — `light` or `dark`
-- `onToggleTheme()` — theme action handler
-- `children` — preview content
+## What the package includes
 
-## Development
+- `src/storybook/manager.jsx` — bridge from the real Storybook index to the
+  custom Butcher shell;
+- `src/StorybookShell.jsx` — responsive MiniApps-based catalog and preview UI;
+- `preset.js` — reusable manager, preview, and Vite integration;
+- `bin/butcher.mjs` — `butcher dev` and `butcher build` commands;
+- `primitives/` — colors, typography, spacing, radii, fonts, and Material Symbols;
+- `mini-app/` — the provider and styles used around project stories;
+- `mini-app/storybook/` — Butcher's own reference catalog and visual test bench.
+
+## Develop Butcher itself
+
+The catalog in `mini-app/storybook` is a real consumer of Butcher. It links the
+package through `portal:../..`, imports only `@mishanaer/butcher/config`, and
+runs the public `butcher` binary. Its MiniApps components and stories play the
+same role as local application code in any other connected project.
 
 ```bash
-npm install
-npm test
-npm run build
+corepack yarn install --immutable
+corepack yarn --cwd mini-app/storybook install --immutable
+corepack yarn dev
 ```
 
-Verify package contents with:
+Run all module, source, token, and production-build checks:
 
 ```bash
-npm run pack:check
+corepack yarn verify
 ```
