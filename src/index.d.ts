@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 
-export * from "../mini-app/index.js"
 export * as primitives from "../primitives/index.js"
 export { defineButcherConfig } from "./config.js"
 

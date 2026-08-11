@@ -6,6 +6,17 @@
   z-index: 1;
 }
 
+.butcher-manager-notifications {
+  position: fixed;
+  left: var(--ui-layout-content-inset);
+  bottom: calc(env(safe-area-inset-bottom) + var(--ui-space-16));
+  z-index: 9000;
+  display: flex;
+  width: min(420px, calc(100vw - 2 * var(--ui-layout-content-inset)));
+  flex-direction: column-reverse;
+  gap: var(--ui-layout-control-gap);
+}
+
 .storybook-shell {
   --storybook-sidebar-width: clamp(300px, 33.333%, 440px);
 
@@ -57,21 +68,29 @@
 .storybook-appbar::before {
   content: "";
   position: absolute;
-  inset: 0 0 -16px;
-  z-index: -1;
-  background: linear-gradient(
+  inset: 0 0 -64px;
+  z-index: 0;
+  background: var(--surface);
+  -webkit-mask-image: linear-gradient(
     to bottom,
-    var(--surface) 0 64px,
-    transparent 80px
+    var(--black) 0%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    var(--black) 0%,
+    transparent 100%
   );
   pointer-events: none;
 }
 
 .storybook-appbar-glass {
-  --glass-background-color: var(--surface);
+  --glass-background-color: transparent;
   --glass-border-color: transparent;
-  --glass-shadow-color: var(--surface);
+  --glass-shadow-color: transparent;
 
+  position: relative;
+  z-index: 1;
   height: 64px;
   border-radius: 0;
 }
@@ -113,6 +132,8 @@
 }
 
 .storybook-appbar .deslop-material-symbol {
+  position: relative;
+  z-index: 3;
   width: 24px;
   height: 24px;
 }

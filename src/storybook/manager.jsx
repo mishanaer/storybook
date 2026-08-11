@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import {
   addons,
   types,
@@ -7,6 +8,7 @@ import {
   useStorybookState,
 } from "storybook/manager-api";
 
+import Snackbar from "../../mini-app/components/Snackbar/Snackbar.js";
 import { StorybookShell } from "../StorybookShell.jsx";
 import {
   getInitialStoryId,
@@ -140,6 +142,67 @@ function BufferedPreview({ api, storyId, story, theme }) {
   );
 }
 
+function ManagerNotificationItem({ notification, onDismiss }) {
+  useEffect(() => {
+    if (!notification.duration) return undefined;
+    const timer = window.setTimeout(
+      () => onDismiss(notification.id),
+      notification.duration,
+    );
+    return () => window.clearTimeout(timer);
+  }, [notification, onDismiss]);
+
+  return (
+    <Snackbar
+      title={notification.content.headline}
+      description={notification.content.subHeadline}
+      action={{
+        label: "Dismiss",
+        onClick: () => onDismiss(notification.id),
+      }}
+    />
+  );
+}
+
+ManagerNotificationItem.propTypes = {
+  notification: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    content: PropTypes.shape({
+      headline: PropTypes.string.isRequired,
+      subHeadline: PropTypes.node,
+    }).isRequired,
+    duration: PropTypes.number,
+  }).isRequired,
+  onDismiss: PropTypes.func.isRequired,
+};
+
+function ManagerNotifications({ notifications, onDismiss, theme }) {
+  if (!notifications.length) return null;
+
+  return (
+    <div
+      className="butcher-manager-notifications apple"
+      data-color-scheme={theme}
+      data-mini-app
+      aria-label="Storybook notifications"
+    >
+      {notifications.map((notification) => (
+        <ManagerNotificationItem
+          key={notification.id}
+          notification={notification}
+          onDismiss={onDismiss}
+        />
+      ))}
+    </div>
+  );
+}
+
+ManagerNotifications.propTypes = {
+  notifications: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onDismiss: PropTypes.func.isRequired,
+  theme: PropTypes.oneOf(["light", "dark"]).isRequired,
+};
+
 function ButcherWorkspace() {
   const api = useStorybookApi();
   const state = useStorybookState();
@@ -211,6 +274,11 @@ function ButcherWorkspace() {
           />
         ) : null}
       </StorybookShell>
+      <ManagerNotifications
+        notifications={state.notifications ?? []}
+        onDismiss={api.clearNotification}
+        theme={theme}
+      />
     </div>
   );
 }
@@ -218,11 +286,25 @@ function ButcherWorkspace() {
 addons.register(ADDON_ID, (api) => {
   const channel = addons.getChannel();
 
-  channel.on(MANAGER_NOTIFICATION_EVENT, (notification) => {
-    api.addNotification(notification);
-  });
-  channel.on(CLEAR_MANAGER_NOTIFICATION_EVENT, (notificationId) => {
-    api.clearNotification(notificationId);
+  const showManagerNotification = (notification) => {
+    if (notification?.id) api.addNotification(notification);
+  };
+  const clearManagerNotification = (notificationId) => {
+    if (notificationId) api.clearNotification(notificationId);
+  };
+
+  channel.on(MANAGER_NOTIFICATION_EVENT, showManagerNotification);
+  channel.on(CLEAR_MANAGER_NOTIFICATION_EVENT, clearManagerNotification);
+
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+
+    if (event.data?.type === MANAGER_NOTIFICATION_EVENT) {
+      showManagerNotification(event.data.notification);
+    }
+    if (event.data?.type === CLEAR_MANAGER_NOTIFICATION_EVENT) {
+      clearManagerNotification(event.data.notificationId);
+    }
   });
 
   addons.setConfig({

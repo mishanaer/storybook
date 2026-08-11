@@ -6,9 +6,12 @@ import test from "node:test";
 const repository = path.resolve(import.meta.dirname, "..");
 
 test("package exposes the reusable config, preset, UI, and primitives", async () => {
-  const packageJson = JSON.parse(
-    await fs.readFile(path.join(repository, "package.json"), "utf8"),
-  );
+  const [packageJson, rootEntry] = await Promise.all([
+    fs
+      .readFile(path.join(repository, "package.json"), "utf8")
+      .then(JSON.parse),
+    fs.readFile(path.join(repository, "src/index.js"), "utf8"),
+  ]);
 
   assert.equal(packageJson.name, "@mishanaer/butcher");
   assert.equal(packageJson.private, undefined);
@@ -18,6 +21,7 @@ test("package exposes the reusable config, preset, UI, and primitives", async ()
   assert.equal(packageJson.exports["./shell"], "./src/StorybookShell.jsx");
   assert.equal(packageJson.exports["./mini-app"], "./mini-app/index.js");
   assert.equal(packageJson.exports["./primitives"], "./primitives/index.js");
+  assert.doesNotMatch(rootEntry, /mini-app\/index/);
 });
 
 test("defineButcherConfig adds the preset without replacing project options", async () => {
@@ -106,6 +110,8 @@ test("manager shell uses primitive fonts and icons", async () => {
     /\.storybook-catalog-group button[\s\S]*background: var\(--elevation-1\)/,
   );
   assert.match(shell, /GlassContainer/);
+  assert.match(shell, /GlassBorder/);
+  assert.equal((shell.match(/<GlassBorder muted \/>/g) ?? []).length, 2);
   assert.match(shell, /PanelHeader/);
   assert.match(shell, /tappable=\{false\}/);
   assert.match(
@@ -114,15 +120,28 @@ test("manager shell uses primitive fonts and icons", async () => {
   );
   assert.match(
     styles,
-    /\.storybook-appbar-glass[\s\S]*--glass-background-color: var\(--surface\)/,
+    /\.storybook-appbar-glass[\s\S]*--glass-background-color: transparent/,
   );
   assert.match(
     styles,
-    /\.storybook-appbar-glass[\s\S]*--glass-shadow-color: var\(--surface\)/,
+    /\.storybook-appbar-glass[\s\S]*--glass-shadow-color: transparent/,
   );
   assert.match(
     styles,
-    /\.storybook-appbar::before[\s\S]*var\(--surface\) 0 64px,[\s\S]*transparent 80px/,
+    /\.storybook-appbar::before[\s\S]*background: var\(--surface\)/,
+  );
+  assert.match(
+    styles,
+    /mask-image: linear-gradient\([\s\S]*var\(--black\) 0%,[\s\S]*transparent 100%/,
+  );
+  assert.match(
+    styles,
+    /\.storybook-appbar::before[\s\S]*inset: 0 0 -64px/,
+  );
+  assert.match(styles, /\.storybook-appbar::before[\s\S]*z-index: 0/);
+  assert.match(
+    styles,
+    /\.storybook-appbar-glass[\s\S]*position: relative;[\s\S]*z-index: 1/,
   );
   assert.match(manager, /butcherTheme/);
   assert.doesNotMatch(manager, /butcherStory/);
@@ -133,6 +152,11 @@ test("manager shell uses primitive fonts and icons", async () => {
   assert.match(manager, /MANAGER_NOTIFICATION_EVENT/);
   assert.match(manager, /api\.addNotification\(notification\)/);
   assert.match(manager, /api\.clearNotification\(notificationId\)/);
+  assert.match(manager, /state\.notifications \?\? \[\]/);
+  assert.match(manager, /<Snackbar/);
+  assert.match(styles, /\.butcher-manager-notifications/);
+  assert.match(manager, /event\.origin !== window\.location\.origin/);
+  assert.match(manager, /event\.data\.notification/);
   assert.match(manager, /pendingFrameRef/);
   assert.match(styles, /\.storybook-preview-frame\.is-pending[\s\S]*visibility: hidden/);
   assert.match(
@@ -200,8 +224,16 @@ test("Butcher's reference catalog consumes the public Butcher package", async ()
   );
   assert.match(consumerConfig, /from "@mishanaer\/butcher\/config"/);
   assert.doesNotMatch(consumerConfig, /\.\.\/\.\.\/\.\.\/src\/config/);
-  assert.match(selfHostedStory, /from "@mishanaer\/butcher\/mini-app"/);
+  assert.doesNotMatch(
+    selfHostedStory,
+    /from "@mishanaer\/butcher\/mini-app"/,
+  );
+  assert.match(
+    selfHostedStory,
+    /@mishanaer\/butcher\/mini-app\/components\/Cells\/index\.js/,
+  );
   assert.match(selfHostedStory, /StorybookShell/);
+  assert.match(selfHostedStory, /window\.parent\.postMessage/);
   assert.match(screenState, /export function getScreenState/);
   assert.match(screenState, /export function setScreenState/);
 });

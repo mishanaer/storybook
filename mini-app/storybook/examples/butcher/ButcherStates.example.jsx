@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import { addons } from "storybook/preview-api"
 
 import { StorybookShell } from "@mishanaer/butcher/shell"
-import {
-    Cell,
-    ModalView,
-    Page,
-    PageSkeleton,
-    PanelHeader,
-    RegularButton,
-    SectionList,
-    StartView,
-    Text,
-    useAppearance,
-    useSnackbar,
-} from "@mishanaer/butcher/mini-app"
+import { RegularButton } from "@mishanaer/butcher/mini-app/components/Button/index.js"
+import { Cell } from "@mishanaer/butcher/mini-app/components/Cells/index.js"
+import ModalView from "@mishanaer/butcher/mini-app/components/ModalView/index.js"
+import Page from "@mishanaer/butcher/mini-app/components/Page/index.js"
+import PageSkeleton from "@mishanaer/butcher/mini-app/components/PageSkeleton/index.js"
+import PanelHeader from "@mishanaer/butcher/mini-app/components/PanelHeader/index.js"
+import SectionList from "@mishanaer/butcher/mini-app/components/SectionList/index.js"
+import { useSnackbar } from "@mishanaer/butcher/mini-app/components/Snackbar/index.js"
+import StartView from "@mishanaer/butcher/mini-app/components/StartView/index.js"
+import Text from "@mishanaer/butcher/mini-app/components/Text/index.js"
+import { useAppearance } from "@mishanaer/butcher/mini-app/hooks/useColorScheme.js"
 import { IconCircleAlert } from "@mishanaer/butcher/primitives/material-symbols-react.js"
 
 import * as styles from "./ButcherStates.example.module.css"
@@ -26,6 +23,11 @@ export const CLEAR_MANAGER_NOTIFICATION_EVENT =
     "@mishanaer/butcher/clear-manager-notification"
 
 const MANAGER_NOTIFICATION_ID = "butcher-ui-preview"
+
+const postManagerMessage = (type, payload) => {
+    if (typeof window === "undefined" || window.parent === window) return
+    window.parent.postMessage({ type, ...payload }, window.location.origin)
+}
 
 const groups = [
     {
@@ -163,22 +165,25 @@ const ModalPreview = () => {
 }
 
 const emitManagerNotification = () =>
-    addons.getChannel().emit(MANAGER_NOTIFICATION_EVENT, {
-        id: MANAGER_NOTIFICATION_ID,
-        content: {
-            headline: "Butcher manager notification",
-            subHeadline: "This is the real Storybook UI above the custom shell.",
+    postManagerMessage(MANAGER_NOTIFICATION_EVENT, {
+        notification: {
+            id: MANAGER_NOTIFICATION_ID,
+            content: {
+                headline: "Butcher manager notification",
+                subHeadline:
+                    "Storybook state rendered through the Butcher UI.",
+            },
+            duration: 0,
         },
-        duration: 0,
     })
 
 const ManagerNotificationPreview = () => {
     useEffect(() => {
         emitManagerNotification()
         return () =>
-            addons
-                .getChannel()
-                .emit(CLEAR_MANAGER_NOTIFICATION_EVENT, MANAGER_NOTIFICATION_ID)
+            postManagerMessage(CLEAR_MANAGER_NOTIFICATION_EVENT, {
+                notificationId: MANAGER_NOTIFICATION_ID,
+            })
     }, [])
 
     return (
