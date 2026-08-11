@@ -13,10 +13,19 @@ function readSavedTheme() {
   return window.localStorage.getItem("mishanaer-storybook-theme") === "dark" ? "dark" : "light";
 }
 
+function getStoryIndex(state) {
+  if (state?.index) return state.index;
+  if (state?.refs?.storybook?.index) return state.refs.storybook.index;
+
+  const firstRef = state?.refs ? Object.values(state.refs).find((ref) => ref?.index) : null;
+  return firstRef?.index || {};
+}
+
 function StorybookWorkspace() {
   const api = useStorybookApi();
   const state = useStorybookState();
-  const groups = useMemo(() => storyIndexToGroups(state.index || {}), [state.index]);
+  const storyIndex = getStoryIndex(state);
+  const groups = useMemo(() => storyIndexToGroups(storyIndex), [storyIndex]);
   const queryStoryId = api.getQueryParam(STORY_QUERY_KEY);
   const [activeId, setActiveId] = useState(() => queryStoryId || state.storyId || null);
   const [theme, setTheme] = useState(readSavedTheme);
@@ -56,24 +65,31 @@ function StorybookWorkspace() {
     }
   };
 
+  const goBack = () => {
+    setActiveId(null);
+    api.setQueryParams({ [STORY_QUERY_KEY]: null, tab: TAB_ID });
+  };
+
   return (
-    <StorybookShell
-      groups={groups}
-      activeId={activeId}
-      onSelect={selectStory}
-      onBack={() => setActiveId(null)}
-      theme={theme}
-      onToggleTheme={() => setTheme((value) => (value === "dark" ? "light" : "dark"))}
-    >
-      {previewHref && activeStory ? (
-        <iframe
-          key={previewHref}
-          title={`${activeStory.storyTitle} — ${activeStory.storyName}`}
-          src={previewHref}
-          style={{ display: "block", width: "100%", height: "100%", minHeight: "calc(100vh - 64px)", border: 0 }}
-        />
-      ) : null}
-    </StorybookShell>
+    <div style={{ position: "fixed", inset: 0, zIndex: 2147483647 }}>
+      <StorybookShell
+        groups={groups}
+        activeId={activeId}
+        onSelect={selectStory}
+        onBack={goBack}
+        theme={theme}
+        onToggleTheme={() => setTheme((value) => (value === "dark" ? "light" : "dark"))}
+      >
+        {previewHref && activeStory ? (
+          <iframe
+            key={previewHref}
+            title={`${activeStory.storyTitle} — ${activeStory.storyName}`}
+            src={previewHref}
+            style={{ display: "block", width: "100%", height: "100%", minHeight: "calc(100vh - 64px)", border: 0 }}
+          />
+        ) : null}
+      </StorybookShell>
+    </div>
   );
 }
 
